@@ -1,0 +1,35 @@
+TARGET javax.crypto.KeyGenerator
+
+VARS
+	int keysize
+	java.security.spec.AlgorithmParameterSpec params
+	javax.crypto.SecretKey key
+	java.lang.String algorithm
+	java.security.SecureRandom random
+
+CONSTRAINTS
+	c1: algorithm in {"AES", "HmacSHA256", "HmacSHA384", "HmacSHA512"}
+	c2: algorithm in {"AES"} => keysize in {128, 192, 256}
+
+METHODS
+	g1: getInstance(algorithm)
+	g2: getInstance(algorithm, _)
+	Get := g1 | g2
+		requires c1
+	i1: init(keysize)
+        requires c2
+	i2: init(keysize, random)
+        requires c2
+		requires java.security.SecureRandom.randomized[random]
+	i3: init(params)
+	i4: init(params, random)
+		requires java.security.SecureRandom.randomized[random]
+	i5: init(random)
+		requires java.security.SecureRandom.randomized[random]
+	Init := i1 | i2 | i3 | i4 | i5
+     
+	GenKey: key = generateKey()
+		ensures generatedKey[key, algorithm]
+
+FLOW
+	Get, Init?, GenKey

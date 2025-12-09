@@ -1,0 +1,39 @@
+TARGET java.io.FileReader
+
+VARS
+    java.lang.String path
+    java.io.File file
+    int data
+
+EXCEPTIONS
+    NullError : java.lang.NullPointerException
+    FileError : java.io.FileNotFoundException
+    IOError   : java.io.IOException
+
+CONSTRAINTS
+    cPath: nonnull(path)
+    cState: nonnull(file)
+
+METHODS
+    c1: FileReader(path)
+        requires cPath else NullError
+
+
+    c2: FileReader(file)
+        requires cState else FileError
+    
+    Constr: c1 | c2
+        ensures opened[this]
+        throws FileError
+
+    r1: data = read()
+        requires opened[this]
+        throws IOError
+
+    cl: close()
+        revokes opened[this]
+        throws IOError
+
+FLOW
+    // Lifecycle: Init -> Read (0 or more) -> Close
+    Constr, r1*, cl

@@ -1,0 +1,26 @@
+TARGET javax.crypto.spec.GCMParameterSpec
+
+VARS 
+	int tagLen
+	byte[] src
+	int offset
+	int len
+
+CONSTRAINTS
+	c1: tagLen in {96, 104, 112, 120, 128}
+	c2: length(src) >= offset + len && offset >= 0 && len > 0
+
+METHODS
+	con1: GCMParameterSpec(tagLen, src)
+		requires c1
+	con2: GCMParameterSpec(tagLen, src, offset, len)
+		requires c2
+
+	Ctor := con1 | con2
+		requires java.security.SecureRandom.randomized[src]
+		ensures preparedGCM[this]
+
+FLOW
+	Ctor
+
+	

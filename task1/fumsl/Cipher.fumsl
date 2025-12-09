@@ -1,0 +1,52 @@
+TARGET javax.crypto.Cipher
+
+VARS
+	java.lang.String transformation
+	int encmode
+	java.security.Key key
+	java.security.spec.AlgorithmParameterSpec paramSpec
+	byte[] input, output
+
+CONSTRAINTS
+	c1: alg(transformation) in {"AES", "RSA"}
+	
+	c2: instanceOf(key, "javax.crypto.SecretKey") => alg(transformation) in {"AES"}
+	c3: instanceOf(key, "java.security.PublicKey") || instanceOf(key, "java.security.PrivateKey") => alg(transformation) in {"RSA"}
+
+	c4: alg(transformation) in {"AES"} => mode(transformation) in {"CBC", "GCM"}
+	c6: alg(transformation) in {"RSA"} => mode(transformation) in {"", "ECB"}
+
+	c6: mode(transformation) in {"CBC"} => pad(transformation) in {"PKCS5Padding", "ISO10126Padding"}
+	c7: mode(transformation) in {"GCM"} => pad(transformation) in {"NoPadding"}
+	c8: alg(transformation) in {"RSA"} => pad(transformation) in {"OAEPWithSHA-256AndMGF1Padding", "PKCS1Padding"}
+
+	c9: alg(transformation) in {"AES"} && mode(transformation) in {"CBC", "GCM"} && encmode in {1} => noCallTo(InitNoIV)
+
+METHODS
+	g1: getInstance(transformation)
+	Get := g1
+		requires c1, c2, c3, c4, c5, c6, c7, c8
+
+	i1: init(encmode, key)
+	InitNoIV := i1
+
+	i2: init(encmode, key, paramSpec)
+	InitIV := i2
+		requires javax.crypto.spec.IvParameterSpec.preparedIV[paramSpec]
+
+	Init := InitNoIV | InitIV
+		requires c9
+		requires javax.crypto.KeyGenerator.generatedKey[key]
+		ensures generatedCipher[this]
+
+	u1: output = update(input)
+	Update := u1
+
+
+	f1: output = doFinal()
+	f2: output = doFinal(input)
+	DoFinal := f1 | f2
+
+FLOW
+	Get, Init, (Update*, DoFinal)+
+		ensures encrypted[output, input]

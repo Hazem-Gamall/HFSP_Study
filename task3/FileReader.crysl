@@ -1,0 +1,16 @@
+SPEC java.io.FileReader
+
+OBJECTS
+    java.lang.String path;
+    java.io.File file;
+
+EVENTS
+    // Requirement 3 (Resource Safety) is covered here:
+    c1: FileReader(path);
+    c2: FileReader(file);
+    r: read();
+    cl: close();
+
+ORDER
+    // Defines the lifecycle: Create -> Read* -> Close
+    (c1 | c2), r*, cl

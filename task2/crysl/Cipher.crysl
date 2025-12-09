@@ -1,0 +1,55 @@
+SPEC javax.crypto.Cipher
+
+OBJECTS
+	java.lang.String transformation;
+	int encmode;
+	java.security.Key key;
+	java.security.spec.AlgorithmParameterSpec paramSpec;
+	byte[] input;
+	byte[] output;
+
+EVENTS
+	g1: getInstance(transformation);
+	Get := g1;
+
+	i1: init(encmode, key);
+	InitNoIV := i1;
+
+	i2: init(encmode, key, paramSpec);
+	InitIV := i2;
+
+	Init := InitNoIV | InitIV;
+
+	u1: output = update(input);
+	Update := u1;
+
+	f1: output = doFinal();
+	f2: output = doFinal(input);
+	DoFinal := f1 | f2;
+
+ORDER
+	Get, Init, (Update*, DoFinal)+
+
+CONSTRAINTS
+	alg(transformation) in {"AES", "RSA"};
+
+	instanceOf[key, javax.crypto.SecretKey] => alg(transformation) in {"AES"};
+	instanceOf[key, java.security.PublicKey] || instanceOf[key, java.security.PrivateKey] => alg(transformation) in {"RSA"};
+
+	alg(transformation) in {"AES"} => mode(transformation) in {"CBC", "GCM"};
+	alg(transformation) in {"RSA"} => mode(transformation) in {"", "ECB"};
+
+	mode(transformation) in {"CBC"} => pad(transformation) in {"PKCS5Padding", "ISO10126Padding"};
+	mode(transformation) in {"GCM"} => pad(transformation) in {"NoPadding"};
+	alg(transformation) in {"RSA"} => pad(transformation) in {"OAEPWithSHA-256AndMGF1Padding", "PKCS1Padding"};
+
+	
+	alg(transformation) in {"AES"} && mode(transformation) in {"CBC", "GCM"} && encmode == 1 => noCallTo[InitNoIV];
+
+REQUIRES
+	generatedKey[key];
+	preparedGCM[paramSpec];
+
+ENSURES
+	generatedCipher[this] after Init;
+	encrypted[output, input];

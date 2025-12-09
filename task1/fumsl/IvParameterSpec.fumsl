@@ -1,0 +1,20 @@
+TARGET javax.crypto.spec.IvParameterSpec
+
+VARS 
+	byte[] iv
+	int offset
+	int len
+
+CONSTRAINTS
+	c1: length(iv) >= offset + len && offset >= 0 && len > 0
+	
+METHODS
+	con1: IvParameterSpec(iv)
+	con2: IvParameterSpec(iv, offset, len)
+		requires c1
+	Ctor := con1 | con2
+		requires java.security.SecureRandom.randomized[iv]
+		ensures	preparedIV[this]
+	
+FLOW
+	Ctor
