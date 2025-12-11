@@ -65,7 +65,7 @@ These helpers are used to write logic in the **CONSTRAINTS** section:
 * **Operators**: Standard math/logic operators are supported: `==`, `!=`, `<`, `>`, `<=`, `>=`, `&&` (AND), `||` (OR).
 
 #### **4. Order Syntax (Sequence & Logic)**
-Defines valid call order using Regular Expression syntax (same as FUMSL).
+Defines valid call order using Regular Expression syntax.
 
 | Symbol | Name | Meaning | Example |
 | :--- | :--- | :--- | :--- |
