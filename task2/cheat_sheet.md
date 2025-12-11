@@ -46,9 +46,9 @@ These helpers are used to write logic in the **CONSTRAINTS** section:
 
 * **`pad(string)`**: Extracts the padding scheme from a transformation string (e.g., "PKCS5Padding").
 
-* **`noCallTo[Method]`**: A typestate constraint that forbids calling the method defined by `Method` (e.g., forbidding an `Init` method that lacks an IV).
+* **`noCallTo[Event]`**: A typestate constraint that forbids calling the method defined by `Method` (e.g., forbidding an `Init` method that lacks an IV).
 
-* **`callTo[Method]`**:  A typestate constraint that checks if the specified `Method` has been called.
+* **`callTo[Event]`**:  A typestate constraint that checks if the specified `Method` has been called.
 
 * **`length[var]`**: Constraints the length of a variable (e.g., string length or array length).
 
