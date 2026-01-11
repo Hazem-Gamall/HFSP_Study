@@ -1,4 +1,4 @@
-package task1;
+package secure_messenger;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;

@@ -1,4 +1,4 @@
-package task2;
+package secure_note_saver;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
