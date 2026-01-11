@@ -1,0 +1,30 @@
+TARGET java.security.KeyFactory
+
+VARS
+	java.lang.String algorithm
+	java.security.spec.KeySpec keySpec
+	java.security.PrivateKey privateKey
+	java.security.PublicKey publicKey
+
+CONSTRAINTS
+	c1: algorithm in {"RSA", "DiffieHellman", "DH", "DSA", "EC"}
+   
+METHODS
+	g1: getInstance(algorithm)
+	g2: getInstance(algorithm, _)
+		requires speccedKey[_]
+	Get := g1 | g2
+		requires c1
+		ensures generatedKeyFactory[this, algorithm]
+
+	GenPriv : privateKey = generatePrivate(keySpec)
+		requires speccedKey[keySpec]
+		ensures generatedPrivkey[privateKey]
+
+	GenPubl: publicKey = generatePublic(keySpec)
+		requires speccedKey[keySpec]
+		ensures generatedPubkey[publicKey]
+    
+FLOW
+	Get, (GenPriv | GenPubl)*
+

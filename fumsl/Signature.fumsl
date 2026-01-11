@@ -1,0 +1,58 @@
+TARGET java.security.Signature
+
+VARS
+	byte[] sign, inputByte, input, output
+	java.nio.ByteBuffer inputByteBuffer
+	java.lang.String algorithm
+	java.security.PrivateKey privateKey
+	java.security.PublicKey publicKey
+	java.security.cert.Certificate cert
+	java.security.spec.AlgorithmParameterSpec params
+	boolean verified
+	int offset, len
+
+CONSTRAINTS
+	c1: algorithm in {"ECDDSA", "SHA256WITHECDDSA", "SHA384WITHECDDSA", "SHA512WITHECDDSA", "SHA3-256WITHECDDSA", "SHA3-384WITHECDDSA",
+        			"SHA3-512WITHECDDSA", "SHA256WITHECNR", "SHA384WITHECNR", "SHA512WITHECNR", "SHA256withECDSA", "SHA256withDSA",
+        			 "SHA384withRSA", "SHA512withRSA", "SHA256withRSA", "SHA384withDSA", "SHA512withDSA",
+        			"QTESLA"};
+    c2: length(input) >= offset + len && offset >= 0 && len > 0
+    
+
+METHODS
+	g1: getInstance(algorithm)
+	g2: getInstance(algorithm, _)
+	Get := g1 | g2
+		requires c1
+
+	i1: initSign(privateKey)
+		requires java.security.KeyFactory.generatedPrivkey[privateKey]
+	i2: initSign(privateKey, _)
+		requires java.security.KeyFactory.generatedPrivkey[privateKey]
+	i3: initVerify(cert)
+	i4: initVerify(publicKey)
+		requires java.security.KeyFactory.generatedPubkey[publicKey]
+	InitSign := i1 | i2
+	InitVerify := i3 | i4
+
+	u1: update(input)
+	u2: update(inputByte)
+	u3: update(input, offset, len)
+		requires c2
+	u4: update(inputByteBuffer)
+	Update := u1 | u2 | u3 | u4
+
+	s1: output = sign()
+	s2: sign(output, offset, len)
+	Sign := s1 | s2
+		ensures signed[output, inputByte], signed[output, input], signed[output, inputByteBuffer]
+
+	v1: verified = verify(sign)
+	v2: verified = verify(sign, offset, len)
+	Verify := v1 | v2
+		ensures verified[verified, sign]
+
+FLOW
+	Get, ((InitSign+, (Update+, Sign+)+ )+ | (InitVerify+, (Update*, Verify+)+ )+ )
+
+

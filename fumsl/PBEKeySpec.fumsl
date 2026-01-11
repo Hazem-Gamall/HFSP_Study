@@ -1,0 +1,38 @@
+TARGET javax.crypto.spec.PBEKeySpec
+
+VARS
+	char[] password
+	byte[] salt
+	int iterationCount, keyLength
+
+	int a
+	char[] ca
+	byte[] ba
+
+CONSTRAINTS
+	constr1: iterationCount >= 10000
+	constr2: neverTypeOf(password, "java.lang.String")
+	constr3: notHardCoded(password)
+
+METHODS
+
+    bad1: PBEKeySpec(ca)
+    denies => Ctor
+
+    bad2: PBEKeySpec(ca, ba, a)
+    denies => Ctor
+
+    c1: PBEKeySpec(password, salt, iterationCount, keyLength)
+    requires java.security.SecureRandom.randomized[salt]
+    requires constr1, constr2, constr3                                       // or: requires constr1 && constr2 && constr3
+
+    Ctor := c1
+    ensures speccedKey[this, keyLength]
+
+    cp1: clearPassword()
+
+    ClearPass := cp1
+    revokes speccedKey[this, _] 
+
+FLOW
+	Ctor, ClearPass

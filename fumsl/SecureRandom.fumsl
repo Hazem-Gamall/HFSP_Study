@@ -1,0 +1,50 @@
+TARGET java.security.SecureRandom
+
+VARS
+	byte[] seed, genSeed
+	java.lang.String algorithm
+	long lSeed
+	byte[] bytes
+	int randInt, randIntInRange, range
+
+CONSTRAINTS
+	c: algorithm in {"SHA1PRNG", "Windows-PRNG", "NativePRNG", "NativePRNGBlocking", "NativePRNGNonBlocking", "PKCS11"}
+
+METHODS
+	c1: SecureRandom()
+	c2: SecureRandom(seed)
+	Ctor := c1 | c2
+
+	g1: getInstance(algorithm)
+		requires c
+	g2: getInstance(algorithm, _)
+		requires c
+	gI: getInstanceStrong()
+	Get := g1 | g2 | gI
+
+	Ins := Get | Ctor
+		ensures randomized[this]
+
+	s1: setSeed(seed)
+		requires randomized[seed]
+	s2: setSeed(lSeed)
+		requires randomized[lSeed]
+	Seed := s1 | s2
+
+	gS: genSeed = generateSeed(_)
+		ensures randomized[genSeed]
+
+	nB: nextBytes(bytes)
+		ensures randomized[bytes]
+	nI: randInt = nextInt()
+		ensures randomized[randInt]
+	nIR: randIntInRange = nextInt(range)
+		ensures randomized[randIntInRange]
+	Next := nB | nI | nIR
+
+	End := gS | Next
+
+FLOW
+	Ins, (Seed?, End*)*
+
+
