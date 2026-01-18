@@ -48,8 +48,7 @@ CONSTRAINTS
 
 REQUIRES
 	generatedKey[key];
-	preparedGCM[paramSpec];
-	preparedIV[paramSpec];
+	preparedIV[paramSpec] || preparedGCM[paramSpec];
 
 ENSURES
 	generatedCipher[this] after Init;
