@@ -32,7 +32,8 @@ METHODS
 
 	i2: init(encmode, key, paramSpec)
 	InitIV := i2
-		requires javax.crypto.spec.IvParameterSpec.preparedIV[paramSpec]
+		requires javax.crypto.spec.IvParameterSpec.preparedIV[paramSpec] 
+			|| javax.crypto.spec.GCMParameterSpec.preparedGCM[paramSpec]
 
 	Init := InitNoIV | InitIV
 		requires c9
